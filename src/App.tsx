@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 import './App.css';
 import {TaskType, Todolist} from "./Todolist";
 import {v1} from "uuid";
-
+import {AddItemForm} from "./AddItemForm";
 
 export type FilterValueType = "all" | "active" | "completed"
 
@@ -15,6 +15,7 @@ type TodoListsType = {
 type TasksStateType = {
     [key: string]: Array<TaskType>
 }
+
 function App() {
 
     let todoList1 = v1()
@@ -42,18 +43,35 @@ function App() {
 
     const addTask = (title: string, todoListId: string) => {
         let task = {id: v1(), title: title, isDone: false}
-        let tasks = tasksObj[todoListId]
-        let newTasks = [task, ...tasks]
-        tasksObj[todoListId] = newTasks
+        let todoListTasks = tasksObj[todoListId]
+        tasksObj[todoListId] = [task, ...todoListTasks]
         setTasks({...tasksObj})
     }
 
+    // function addTask(title: string, todolistId: string) {
+    //     let task = {id: v1(), title: title, isDone: false};
+    //     //достанем нужный массив по todolistId:
+    //     let todolistTasks = tasks[todolistId];
+    //     // перезапишем в этом объекте массив для нужного тудулиста копией, добавив в начало новую таску:
+    //     tasks[todolistId] = [task, ...todolistTasks];
+    //     // засетаем в стейт копию объекта, чтобы React отреагировал перерисовкой
+    //     setTasks({...tasks});
+    // }
+
     const removeTask = (id: string, todoListId: string) => {
-        let tasks = tasksObj[todoListId]
-        let filteredTask = tasks.filter(task => task.id !== id)
-        tasksObj[todoListId] = filteredTask
+        let todoListsTasks = tasksObj[todoListId]
+        tasksObj[todoListId] = todoListsTasks.filter(el => el.id !== id)
         setTasks({...tasksObj})
     }
+
+    // function removeTask(id: string, todolistId: string) {
+    //     //достанем нужный массив по todolistId:
+    //     let todolistTasks = tasks[todolistId];
+    //     // перезапишем в этом объекте массив для нужного тудулиста отфилтрованным массивом:
+    //     tasks[todolistId] = todolistTasks.filter(t => t.id != id);
+    //     // засетаем в стейт копию объекта, чтобы React отреагировал перерисовкой
+    //     setTasks({...tasks});
+    // }
 
     const changeTaskStatus = (id: string, isDone: boolean, todoListId: string) => {
         let tasks = tasksObj[todoListId]
@@ -63,6 +81,7 @@ function App() {
             setTasks({...tasksObj})
         }
     }
+
     const changeFilter = (value: FilterValueType, todoListId: string) => {
         let todoList = todoLists.find(el => el.id === todoListId)
         if (todoList) {
@@ -71,7 +90,7 @@ function App() {
         setTodoLists([...todoLists])
     }
 
-    let removeTodoList = (todoListId: string) => {
+    const removeTodoList = (todoListId: string) => {
         let filteredTodoList = todoLists.filter(el => el.id !== todoListId)
         setTodoLists(filteredTodoList)
 
@@ -79,9 +98,39 @@ function App() {
         setTasks({...tasksObj})
     }
 
+    const AddTodoList = (title: string) => {
+        let todoList: TodoListsType = {
+            id: v1(),
+            title: title,
+            filter: "all"
+        }
+        setTodoLists([todoList, ...todoLists])
+        setTasks({...tasksObj, [todoList.id]: []})
+    }
+
+    const changeTaskTitle = (id: string, newTitle: string, todoListId: string) => {
+        //достаем нужный массив по todoListId
+        let todoListTasks = tasksObj[todoListId]
+        //находим нужную таску
+        let task = todoListTasks.find(t => t.id === id)
+        //если она нашлась, изменим ее
+        if (task) {
+            task.title = newTitle;
+            setTasks({...tasksObj})
+        }
+    }
+
+    const changeTodoListTitle = (id: string, newTitle: string) => {
+        const todoList = todoLists.find(el => el.id === id)
+        if (todoList) {
+            todoList.title = newTitle
+            setTodoLists([...todoLists])
+        }
+    }
 
     return (
         <div className="App">
+            <AddItemForm addItem={AddTodoList}/>
             {
                 todoLists.map(el => {
                     let tasksForTodoList = tasksObj[el.id];
@@ -102,6 +151,8 @@ function App() {
                         addTask={addTask}
                         changeTaskStatus={changeTaskStatus}
                         removeTodoList={removeTodoList}
+                        changeTaskTitle={changeTaskTitle}
+                        changeTodoListTitle={changeTodoListTitle}
                         filter={el.filter}
                     />
                 })
