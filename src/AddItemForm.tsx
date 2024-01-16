@@ -49,16 +49,7 @@ export const AddItemForm = (props: AddItemFormPropsType) => {
                 onChange={onChangeHandler}
                 onKeyDown={onKeyDownHandler}
             />
-            {/*<input*/}
-            {/*    value={title}*/}
-            {/*    onChange={onChangeHandler}*/}
-            {/*    onKeyDown={onKeyDownHandler}*/}
-            {/*    className={error ? "error" : ""}*/}
-            {/*/>*/}
-            {/*<button onClick={addTask}>+</button>*/}
-
             <Button onClick={addTask} style={buttonStyles} variant="contained">+</Button>
-            {/*{error && <div className="error-message">{error}</div>}*/}
         </div>
     );
 };
